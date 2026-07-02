@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Do you love me?</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000000;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100vh;
+            min-height: 100dvh;
+            font-family: "Press Start 2P", monospace;
+        }
+
+        .wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .pixel-window {
+            background-color: #000000;
+            border: 6px double #ffffff;
+            width: 400px;
+            max-width: 90%;
+            box-shadow: 12px 12px 0 #1a1a1a;
+            transition: transform 40ms linear;
+        }
+
+        .letter-window {
+            width: min(92vw, 760px);
+        }
+
+        .window-bar {
+            border-bottom: 4px solid #ffffff;
+            padding: 10px;
+            display: flex;
+            gap: 6px;
+        }
+
+        .window-dot {
+            width: 8px;
+            height: 8px;
+            border: 2px solid #ffffff;
+        }
+
+        .window-body {
+            padding: 50px 20px;
+            text-align: center;
+        }
+
+        .letter-body {
+            padding: 28px;
+        }
+
+        .title-text {
+            color: #ffffff;
+            font-size: 13pt;
+            line-height: 1.6;
+            margin: 0 0 45px;
+            font-weight: normal;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .pixel-btn {
+            background: transparent;
+            color: #ffffff;
+            border: 4px outset #ffffff;
+            padding: 12px 24px;
+            font-size: 11pt;
+            cursor: pointer;
+            font-family: "Press Start 2P", monospace;
+            outline: none;
+        }
+
+        .pixel-btn:hover {
+            background: #ffffff;
+            color: #000000;
+            border: 4px inset #ffffff;
+        }
+
+        .letter-prompt {
+            color: #ffffff;
+            font-size: 8pt;
+            line-height: 1.8;
+            margin: 20px 0 0;
+        }
+
+        .love-letter {
+            position: relative;
+            width: min(356px, 82vw);
+            aspect-ratio: 72 / 53;
+            margin: 0 auto;
+            image-rendering: pixelated;
+        }
+
+        .envelope-art {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(8px 8px 0 #222222);
+            pointer-events: none;
+        }
+
+        .heart-open-btn {
+            position: absolute;
+            top: 58%;
+            left: 50%;
+            width: min(98px, 28vw);
+            aspect-ratio: 7 / 6;
+            border: 0;
+            padding: 0;
+            transform: translate(-50%, -50%);
+            background: transparent;
+            cursor: pointer;
+            z-index: 2;
+            filter:
+                drop-shadow(0 0 4px #ffb6de)
+                drop-shadow(0 0 13px #ff4faa);
+            transition: filter 120ms linear, transform 120ms linear;
+        }
+
+        .pixel-heart-art {
+            display: block;
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+        }
+
+        .heart-open-btn:hover,
+        .heart-open-btn:focus-visible {
+            filter:
+                drop-shadow(0 0 7px #ffe1f1)
+                drop-shadow(0 0 22px #ff3399);
+            outline: none;
+            transform: translate(-50%, -50%) scale(1.07);
+            animation: heartPulse 680ms steps(2, end) infinite;
+        }
+
+        @keyframes heartPulse {
+            50% {
+                filter:
+                    drop-shadow(0 0 3px #ffb6de)
+                    drop-shadow(0 0 10px #ff4faa);
+            }
+        }
+
+        .confession-text {
+            max-height: min(48vh, 380px);
+            overflow-y: auto;
+            padding: 18px;
+            border: 3px solid #ffffff;
+            color: #ffffff;
+            font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", Arial, sans-serif;
+            font-size: 13pt;
+            line-height: 1.85;
+            text-align: left;
+            white-space: pre-line;
+        }
+
+        .letter-actions {
+            margin-top: 24px;
+        }
+
+        .back-btn {
+            display: none;
+            position: absolute;
+            left: 50%;
+            bottom: 40px;
+            transform: translateX(-50%);
+            z-index: 30;
+        }
+
+        .pixel-smiler {
+            display: none;
+            color: #ffffff;
+            font-size: clamp(24pt, 9vw, 45pt);
+            line-height: 1.35;
+            width: min(92vw, 760px);
+            text-align: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            overflow-wrap: anywhere;
+        }
+
+        .neon-center-set {
+            display: none;
+            position: absolute;
+            top: 53%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+            z-index: 6;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .neon-text {
+            color: #ffccff;
+            font-size: 26pt;
+            text-align: center;
+            margin-bottom: 5px;
+            text-shadow:
+                0 0 5px #ffccff,
+                0 0 15px #ff3399,
+                0 0 30px #ff3399;
+        }
+
+        .neon-heart-svg {
+            width: 140px;
+            height: 140px;
+            filter:
+                drop-shadow(0 0 4px #ffccff)
+                drop-shadow(0 0 10px #ff3399)
+                drop-shadow(0 0 25px #ff3399)
+                drop-shadow(0 0 45px #ff3399);
+        }
+
+        .matrix-bg {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            justify-content: space-between;
+            overflow: hidden;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .matrix-column {
+            display: flex;
+            flex-direction: column;
+            white-space: nowrap;
+            font-size: 13px;
+            line-height: 1.5;
+            color: rgba(255, 51, 153, 0.45);
+            user-select: none;
+        }
+
+        .matrix-move {
+            animation: scrollDown 10s linear infinite;
+        }
+
+        .matrix-column:nth-child(even) .matrix-move {
+            animation-duration: 7s;
+        }
+
+        @keyframes scrollDown {
+            0% {
+                transform: translateY(-50%);
+            }
+
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 520px) {
+            body {
+                height: 100dvh;
+            }
+
+            .wrapper {
+                padding: 16px;
+            }
+
+            .pixel-window {
+                width: 100%;
+                max-width: 360px;
+                border-width: 4px;
+                box-shadow: 7px 7px 0 #1a1a1a;
+            }
+
+            .window-bar {
+                border-bottom-width: 3px;
+                padding: 8px;
+            }
+
+            .window-body {
+                padding: 34px 14px;
+            }
+
+            .letter-body {
+                padding: 18px 14px;
+            }
+
+            .title-text {
+                font-size: 10pt;
+                line-height: 1.7;
+                margin-bottom: 28px;
+            }
+
+            .letter-prompt {
+                font-size: 7pt;
+            }
+
+            .love-letter {
+                width: min(306px, 78vw);
+            }
+
+            .heart-open-btn {
+                width: min(84px, 25vw);
+            }
+
+            .btn-container {
+                flex-wrap: wrap;
+                gap: 14px;
+            }
+
+            .pixel-btn {
+                min-width: 112px;
+                padding: 12px 16px;
+                font-size: 9pt;
+            }
+
+            .neon-text {
+                font-size: clamp(18pt, 9vw, 26pt);
+                line-height: 1.35;
+            }
+
+            .neon-heart-svg {
+                width: 112px;
+                height: 112px;
+            }
+
+            .matrix-column {
+                font-size: 11px;
+            }
+
+            .back-btn {
+                bottom: 24px;
+            }
+
+            .confession-text {
+                max-height: 44vh;
+                padding: 14px;
+                font-size: 11.5pt;
+                line-height: 1.75;
+            }
+        }
+
+        @media (hover: none) {
+            .pixel-btn:hover {
+                background: transparent;
+                color: #ffffff;
+                border: 4px outset #ffffff;
+            }
+
+            .pixel-btn:active {
+                background: #ffffff;
+                color: #000000;
+                border: 4px inset #ffffff;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper" id="introInterface">
+        <div class="pixel-window">
+            <div class="window-bar">
+                <span class="window-dot"></span>
+                <span class="window-dot"></span>
+                <span class="window-dot"></span>
+            </div>
+            <div class="window-body">
+                <h1 class="title-text">A love letter</h1>
+                <div class="love-letter">
+                    <svg class="envelope-art" viewBox="0 0 360 265" aria-hidden="true" focusable="false">
+                        <defs>
+                            <pattern id="paperGrid" width="10" height="10" patternUnits="userSpaceOnUse">
+                                <path d="M10 0H0V10" fill="none" stroke="#ededed" stroke-width="1"/>
+                            </pattern>
+                        </defs>
+
+                        <rect x="72" y="88" width="228" height="138" fill="#242424"/>
+                        <rect x="102" y="34" width="156" height="94" fill="#ffffff"/>
+                        <rect x="112" y="44" width="136" height="72" fill="url(#paperGrid)" opacity="0.62"/>
+                        <rect x="126" y="58" width="108" height="6" fill="#111111"/>
+                        <rect x="126" y="78" width="78" height="6" fill="#111111"/>
+                        <rect x="126" y="98" width="102" height="6" fill="#111111"/>
+                        <rect x="238" y="46" width="10" height="10" fill="#f2f2f2"/>
+
+                        <rect x="60" y="94" width="240" height="116" fill="#ffffff"/>
+                        <rect x="72" y="82" width="216" height="12" fill="#ffffff"/>
+                        <rect x="48" y="106" width="12" height="80" fill="#ffffff"/>
+                        <rect x="300" y="106" width="12" height="80" fill="#ffffff"/>
+                        <rect x="72" y="210" width="216" height="10" fill="#ffffff"/>
+
+                        <rect x="72" y="94" width="216" height="8" fill="#f3f3f3"/>
+                        <rect x="60" y="186" width="240" height="14" fill="#f6f6f6"/>
+                        <rect x="84" y="220" width="192" height="8" fill="#767676"/>
+
+                        <rect x="82" y="108" width="10" height="10" fill="#000000"/>
+                        <rect x="92" y="118" width="10" height="10" fill="#000000"/>
+                        <rect x="102" y="128" width="10" height="10" fill="#000000"/>
+                        <rect x="112" y="138" width="10" height="10" fill="#000000"/>
+                        <rect x="122" y="148" width="10" height="10" fill="#000000"/>
+                        <rect x="132" y="158" width="10" height="10" fill="#000000"/>
+                        <rect x="142" y="168" width="10" height="10" fill="#000000"/>
+                        <rect x="152" y="178" width="10" height="10" fill="#000000"/>
+
+                        <rect x="268" y="108" width="10" height="10" fill="#000000"/>
+                        <rect x="258" y="118" width="10" height="10" fill="#000000"/>
+                        <rect x="248" y="128" width="10" height="10" fill="#000000"/>
+                        <rect x="238" y="138" width="10" height="10" fill="#000000"/>
+                        <rect x="228" y="148" width="10" height="10" fill="#000000"/>
+                        <rect x="218" y="158" width="10" height="10" fill="#000000"/>
+                        <rect x="208" y="168" width="10" height="10" fill="#000000"/>
+                        <rect x="198" y="178" width="10" height="10" fill="#000000"/>
+
+                        <rect x="82" y="190" width="10" height="10" fill="#000000"/>
+                        <rect x="92" y="180" width="10" height="10" fill="#000000"/>
+                        <rect x="102" y="170" width="10" height="10" fill="#000000"/>
+                        <rect x="112" y="160" width="10" height="10" fill="#000000"/>
+                        <rect x="122" y="150" width="10" height="10" fill="#000000"/>
+
+                        <rect x="268" y="190" width="10" height="10" fill="#000000"/>
+                        <rect x="258" y="180" width="10" height="10" fill="#000000"/>
+                        <rect x="248" y="170" width="10" height="10" fill="#000000"/>
+                        <rect x="238" y="160" width="10" height="10" fill="#000000"/>
+                        <rect x="228" y="150" width="10" height="10" fill="#000000"/>
+
+                        <rect x="152" y="190" width="56" height="6" fill="#bfbfbf"/>
+                        <rect x="116" y="122" width="10" height="10" fill="#f7f7f7"/>
+                        <rect x="234" y="122" width="10" height="10" fill="#e4e4e4"/>
+                        <rect x="64" y="110" width="8" height="8" fill="#ffffff"/>
+                        <rect x="288" y="196" width="8" height="8" fill="#d0d0d0"/>
+                    </svg>
+                    <button class="heart-open-btn" type="button" onclick="openLetter()" aria-label="Open love letter">
+                        <svg class="pixel-heart-art" viewBox="0 0 7 6" aria-hidden="true" focusable="false">
+                            <rect x="1" y="0" width="2" height="1" fill="#000000"/>
+                            <rect x="4" y="0" width="2" height="1" fill="#000000"/>
+                            <rect x="0" y="1" width="7" height="1" fill="#000000"/>
+                            <rect x="0" y="2" width="7" height="1" fill="#000000"/>
+                            <rect x="1" y="3" width="5" height="1" fill="#000000"/>
+                            <rect x="2" y="4" width="3" height="1" fill="#000000"/>
+                            <rect x="3" y="5" width="1" height="1" fill="#000000"/>
+                            <rect x="1" y="1" width="2" height="1" fill="#ff77bd"/>
+                            <rect x="4" y="1" width="2" height="1" fill="#ff5fae"/>
+                            <rect x="1" y="2" width="5" height="1" fill="#ff2f68"/>
+                            <rect x="2" y="3" width="3" height="1" fill="#f21d46"/>
+                            <rect x="3" y="4" width="1" height="1" fill="#b3132e"/>
+                            <rect x="5" y="2" width="1" height="1" fill="#ffe1f1"/>
+                        </svg>
+                    </button>
+                </div>
+                <p class="letter-prompt">Click the heart</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="wrapper" id="letterInterface" style="display: none;">
+        <div class="pixel-window letter-window">
+            <div class="window-bar">
+                <span class="window-dot"></span>
+                <span class="window-dot"></span>
+                <span class="window-dot"></span>
+            </div>
+            <div class="window-body letter-body">
+                <h1 class="title-text">For you</h1>
+                <div class="confession-text">雖然我在越南，而姐姐在台灣，這段距離有時候真的讓我很想妳。很多時候，我只希望自己能離妳近一點，能親眼見到妳，能用最簡單的小事關心妳、照顧妳。我知道我比妳小三歲，也許在妳眼裡我還不夠成熟，但我對妳的感情是真心的、認真的，絕對不是一時衝動。
+
+我喜歡妳，不只是因為妳可愛，更是因為妳給我一種很安心、很溫暖的感覺。我想陪妳分享開心的事，也想在妳累的時候聽妳說說話，陪妳一起面對生活裡的喜怒哀樂。我希望我們可以一起努力，讓越南和台灣之間的距離，不再成為阻擋我們的理由。
+
+如果妳願意給我一個機會，我一定會好好珍惜妳，用我的真心去對待妳。我真的很想成為妳的男朋友，認真地走進妳的生活，和妳一起經營一段長久而穩定的感情。</div>
+                <div class="btn-container letter-actions">
+                    <button class="pixel-btn" type="button" onclick="showQuestion()">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="wrapper" id="viewInterface" style="display: none;">
+        <div class="pixel-window" id="popupWindow">
+            <div class="window-bar">
+                <span class="window-dot"></span>
+                <span class="window-dot"></span>
+                <span class="window-dot"></span>
+            </div>
+            <div class="window-body">
+                <h1 class="title-text">Do you love me?</h1>
+                <div class="btn-container">
+                    <button class="pixel-btn" type="button" onclick="triggerYes()">Yes</button>
+                    <button class="pixel-btn" type="button" onclick="triggerNo()">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="pixel-smiler" id="smileContainer">I LOVE YOU &lt;3</div>
+
+    <div class="neon-center-set" id="neonSet">
+        <div class="neon-text">LOVE ME</div>
+        <svg class="neon-heart-svg" viewBox="0 0 24 24" fill="#ffccff" aria-hidden="true">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+    </div>
+
+    <div class="matrix-bg" id="bgContainer"></div>
+
+    <button class="pixel-btn back-btn" id="backButton" type="button" onclick="goBack()">Back</button>
+
+    <script>
+        const bgContainer = document.getElementById("bgContainer");
+        const introInterface = document.getElementById("introInterface");
+        const letterInterface = document.getElementById("letterInterface");
+        const viewInterface = document.getElementById("viewInterface");
+        const smileContainer = document.getElementById("smileContainer");
+        const neonSet = document.getElementById("neonSet");
+        const popupWindow = document.getElementById("popupWindow");
+        const backButton = document.getElementById("backButton");
+        let currentScreen = "intro";
+
+        function buildMatrixBackground() {
+            bgContainer.innerHTML = "";
+
+            const charWidth = 95;
+            const columnCount = Math.ceil(window.innerWidth / charWidth) + 1;
+            let textBlock = "";
+
+            for (let i = 0; i < 60; i += 1) {
+                textBlock += "LOVE ME<br>";
+            }
+
+            for (let i = 0; i < columnCount; i += 1) {
+                const column = document.createElement("div");
+                const movingText = document.createElement("div");
+
+                column.className = "matrix-column";
+                movingText.className = "matrix-move";
+                movingText.innerHTML = textBlock + textBlock;
+
+                column.style.opacity = (Math.random() * 0.5 + 0.3).toFixed(2);
+                movingText.style.animationDelay = `${Math.random() * -10}s`;
+
+                column.appendChild(movingText);
+                bgContainer.appendChild(column);
+            }
+        }
+
+        window.addEventListener("resize", buildMatrixBackground);
+
+        function hideScreens() {
+            introInterface.style.display = "none";
+            letterInterface.style.display = "none";
+            viewInterface.style.display = "none";
+        }
+
+        function resetChoiceResult() {
+            smileContainer.style.display = "none";
+            neonSet.style.display = "none";
+            bgContainer.style.opacity = "0";
+            bgContainer.style.display = "none";
+            bgContainer.innerHTML = "";
+            popupWindow.style.transform = "none";
+        }
+
+        function showBackButton() {
+            backButton.style.display = "block";
+        }
+
+        function showScreen(screenName) {
+            resetChoiceResult();
+            hideScreens();
+            currentScreen = screenName;
+            backButton.style.display = screenName === "intro" ? "none" : "block";
+
+            if (screenName === "intro") {
+                introInterface.style.display = "flex";
+            }
+
+            if (screenName === "letter") {
+                letterInterface.style.display = "flex";
+            }
+
+            if (screenName === "question") {
+                viewInterface.style.display = "flex";
+            }
+        }
+
+        function openLetter() {
+            showScreen("letter");
+        }
+
+        function showQuestion() {
+            showScreen("question");
+        }
+
+        function triggerYes() {
+            resetChoiceResult();
+            hideScreens();
+            viewInterface.style.display = "none";
+            smileContainer.style.display = "block";
+            currentScreen = "yes";
+            showBackButton();
+        }
+
+        function triggerNo() {
+            resetChoiceResult();
+            popupWindow.style.transform = "translate(4px, 4px)";
+            setTimeout(() => {
+                popupWindow.style.transform = "translate(-4px, -4px)";
+            }, 40);
+            setTimeout(() => {
+                popupWindow.style.transform = "translate(4px, -4px)";
+            }, 80);
+
+            setTimeout(() => {
+                hideScreens();
+
+                buildMatrixBackground();
+                bgContainer.style.display = "flex";
+                setTimeout(() => {
+                    bgContainer.style.opacity = "1";
+                }, 10);
+                neonSet.style.display = "flex";
+                currentScreen = "no";
+                showBackButton();
+            }, 130);
+        }
+
+        function goBack() {
+            if (currentScreen === "letter") {
+                showScreen("intro");
+                return;
+            }
+
+            if (currentScreen === "question") {
+                showScreen("letter");
+                return;
+            }
+
+            if (currentScreen === "yes" || currentScreen === "no") {
+                showScreen("question");
+                return;
+            }
+
+            showScreen("intro");
+        }
+    </script>
+</body>
+</html>
